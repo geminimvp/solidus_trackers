@@ -1,4 +1,11 @@
 class Spree::Tracker < ActiveRecord::Base
+
+  TYPES = [
+    'Google Analytics',
+    'Facebook Pixel',
+    'Custom',
+  ].freeze
+
   belongs_to :store
 
   def self.current(store = nil)
