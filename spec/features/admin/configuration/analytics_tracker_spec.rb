@@ -2,11 +2,13 @@ require 'spec_helper'
 
 describe "Analytics Tracker", type: :feature do
   stub_authorization!
-  let!(:store) { create(:store) }
+  let!(:store1) { create(:store) }
+  let!(:tracker1) { create(:tracker, store: store1) }
+  let!(:store2) { create(:store) }
+  let!(:tracker2) { create(:tracker, analytics_id: 'B100', tracker_type: 'facebook_pixel', active: false, store: store2) }
 
   context "index" do
     before(:each) do
-      2.times { create(:tracker, store: store) }
       visit spree.admin_path
       click_link "Settings"
       click_link "Analytics Tracker"
@@ -16,17 +18,19 @@ describe "Analytics Tracker", type: :feature do
       expect(page).to have_content("Analytics Trackers")
     end
 
-    it "should have the right tabular values displayed" do
+    it "should have the right tabular values displayed for the current store" do
       within_row(1) do
-        expect(column_text(1)).to eq("A100")
-        expect(column_text(2)).to eq("Google Analytics")
-        expect(column_text(3)).to eq("Active")
+        expect(column_text(1)).to eq(tracker1.analytics_id)
+        expect(column_text(2)).to eq(tracker1.tracker_type.split('_').map(&:capitalize).join(' '))
+        expect(column_text(3)).to eq(tracker1.boolean_to_string)
       end
+    end
 
-      within_row(2) do
-        expect(column_text(1)).to eq("A100")
-        expect(column_text(2)).to eq("Google Analytics")
-        expect(column_text(3)).to eq("Active")
+    it "should not have the tabular values displayed for the other store" do
+      within_row(1) do
+        expect(column_text(1)).to_not eq(tracker2.analytics_id)
+        expect(column_text(2)).to_not eq(tracker2.tracker_type.split('_').map(&:capitalize).join(' '))
+        expect(column_text(3)).to_not eq(tracker2.boolean_to_string)
       end
     end
   end
@@ -36,27 +40,33 @@ describe "Analytics Tracker", type: :feature do
       visit spree.admin_path
       click_link "Settings"
       click_link "Analytics Tracker"
+      click_link "admin_new_tracker_link"
+      fill_in "tracker_analytics_id", with: tracker1.analytics_id
+      select all("#tracker_tracker_type option")[1].text, from: "tracker_tracker_type"
+      click_button "Create"
     end
 
-    it "should be able to create a new analytics tracker" do
-      click_link "admin_new_tracker_link"
-      fill_in "tracker_analytics_id", with: "A100"
-      select all("#tracker_tracker_type option")[1].text, from: "tracker_tracker_type"
-      select all("#tracker_store_id option")[1].text, from: "tracker_store_id"
-      click_button "Create"
-
-      expect(page).to have_content("successfully created!")
+    it "should be able to create a new analytics tracker for the current store only" do
+      expect(page).to have_content("Tracker created")
       within_row(1) do
-        expect(column_text(1)).to eq("A100")
-        expect(column_text(2)).to eq("Google Analytics")
-        expect(column_text(3)).to eq("Active")
+        expect(column_text(1)).to eq(tracker1.analytics_id)
+        expect(column_text(2)).to eq(tracker1.tracker_type.split('_').map(&:capitalize).join(' '))
+        expect(column_text(3)).to eq(tracker1.boolean_to_string)
+      end
+    end
+
+    it "should not be able to create a new analytics tracker for the other store only" do
+      within_row(1) do
+        expect(column_text(1)).to_not eq(tracker2.analytics_id)
+        expect(column_text(2)).to_not eq(tracker2.tracker_type.split('_').map(&:capitalize).join(' '))
+        expect(column_text(3)).to_not eq(tracker2.boolean_to_string)
       end
     end
   end
 
   context "store" do
-    it "should display the script tag if a tracking id is provided" do
-      create(:tracker, store: store)
+    it "should display the script tag if a tracking id is provided for the current store only" do
+      create(:tracker, store: store1)
 
       visit spree.root_path
       expect(page).to have_css('#solidus_trackers_google_analytics', visible: false)

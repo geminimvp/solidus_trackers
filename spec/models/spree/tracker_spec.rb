@@ -58,4 +58,14 @@ describe Spree::Tracker, type: :model do
       expect(Spree::Tracker.by_type(store, tracker.tracker_type)).to eq(tracker)
     end
   end
+
+  describe 'by current store' do
+    it 'returns only the tracker that belongs to the current store' do
+      expect(tracker.store).to eq(store)
+    end
+
+    it 'does not return the tracker that belongs to the other store' do
+      expect(other_tracker.store).to_not eq(store)
+    end
+  end
 end
