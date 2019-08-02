@@ -3,5 +3,6 @@ FactoryBot.define do
     analytics_id { 'A100' }
     active { true }
     tracker_type { 'google_analytics' }
+    store
   end
 end

@@ -30,4 +30,8 @@ class Spree::Tracker < ActiveRecord::Base
                          store_id: store,
                          tracker_type: type).first
   end
+
+  def boolean_to_string
+    active ? 'Active' : 'Inactive'
+  end
 end
