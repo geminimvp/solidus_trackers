@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 # git_source(:github) { |repo_name| 'https://github.com/#{repo_name}.git' }
 
 branch = ENV.fetch('SOLIDUS_BRANCH', 'master')
-gem 'solidus', github: 'geminimvp/solidus', branch: 'gemini_master_v271'
+gem 'solidus', github: 'geminimvp/solidus', branch: 'gemini_master_v284'
 gem 'solidus_auth_devise', '~> 1.0'
 
 # if branch == 'master' || branch >= 'v2.3'
@@ -14,7 +14,7 @@ gem 'solidus_auth_devise', '~> 1.0'
 gem 'rails', '5.2.3'
 
 # gem 'mysql2', '~> 0.4.10'
-gem 'pg', '~> 0.21'
+gem 'pg', '>= 0.21'
 
 group :test do
   if branch == 'master' || branch >= 'v2.0'

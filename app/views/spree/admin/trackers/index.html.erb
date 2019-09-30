@@ -1,7 +1,7 @@
 <%= render 'spree/admin/shared/general_tabs' %>
 
-<% admin_breadcrumb(Spree.t(:settings)) %>
-<% admin_breadcrumb(Spree.t(:general_settings)) %>
+<% admin_breadcrumb(I18n.t(:settings, scope: :spree)) %>
+<% admin_breadcrumb(I18n.t(:general_settings, scope: :spree)) %>
 <% admin_breadcrumb(plural_resource_name(Spree::Tracker)) %>
 
 <% content_for :page_actions do %>
